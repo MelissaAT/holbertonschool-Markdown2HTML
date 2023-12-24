@@ -7,6 +7,13 @@
 import sys
 import os
 
+def convert_headings(line):
+    """Convert Markdown headings to HTML headings."""
+    for i in range(6, 0, -1):
+        if line.startswith('#' * i):
+            return f"<h{i}>{line[i+1:].strip()}</h{i}>"
+    return line
+
 def main():
     # Check if the number of arguments is less than 2
     if len(sys.argv) < 3:
@@ -19,7 +26,11 @@ def main():
         print(f"Missing {markdown_file}", file=sys.stderr)
         exit(1)
 
-
+    # Open the Markdown file and the output HTML file
+    with open(markdown_file, 'r') as md_file, open(sys.argv[2], 'w') as html_file:
+        for line in md_file:
+            html_line = convert_headings(line)
+            html_file.write(html_line + '\n')
 
     exit(0)
 
