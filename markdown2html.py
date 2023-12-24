@@ -50,6 +50,29 @@ def convert_lists(lines):
 
     return html_lines
 
+def convert_paragraphs(lines):
+    """Convert text blocks into HTML paragraphs."""
+    html_lines = []
+    paragraph = []
+
+    for line in lines:
+        if line == '\n':
+            if paragraph:
+                html_lines.append('<p>')
+                html_lines.append('<br/>'.join(paragraph))
+                html_lines.append('</p>')
+                paragraph = []
+        else:
+            paragraph.append(line.strip())
+
+    # Add the last paragraph if exists
+    if paragraph:
+        html_lines.append('<p>')
+        html_lines.append('<br/>'.join(paragraph))
+        html_lines.append('</p>')
+
+    return html_lines
+
 def main():
     # Check if the number of arguments is less than 2
     if len(sys.argv) < 3:
@@ -75,6 +98,7 @@ def main():
             html_lines.append(line)
 
     html_lines = convert_lists(html_lines)
+    html_lines = convert_paragraphs(html_lines)
 
     # Write the HTML output
     with open(sys.argv[2], 'w') as html_file:
