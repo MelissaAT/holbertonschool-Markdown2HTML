@@ -6,6 +6,13 @@
 '''
 import sys
 import os
+import re
+
+def convert_bold(text):
+    """Convert Markdown bold syntax to HTML bold tags."""
+    text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
+    text = re.sub(r'__(.*?)__', r'<em>\1</em>', text)
+    return text
 
 def convert_headings(line):
     """Convert Markdown headings to HTML headings."""
@@ -21,6 +28,8 @@ def convert_lists(lines):
     html_lines = []
 
     for line in lines:
+        line = convert_bold(line)  # Convert bold syntax within the line
+
         if line.startswith('- '):
             if not in_ul:
                 if in_ol:  # Close ordered list if open
@@ -56,6 +65,8 @@ def convert_paragraphs(lines):
     paragraph = []
 
     for line in lines:
+        line = convert_bold(line)  # Convert bold syntax within the line
+
         if line == '\n':
             if paragraph:
                 html_lines.append('<p>')
@@ -91,6 +102,7 @@ def main():
 
     html_lines = []
     for line in lines:
+        line = convert_bold(line)  # Convert bold syntax within the line
         heading = convert_headings(line)
         if heading is not None:
             html_lines.append(heading)
