@@ -15,23 +15,39 @@ def convert_headings(line):
     return None
 
 def convert_lists(lines):
-    """Convert Markdown lists to HTML lists."""
-    in_list = False
+    """Convert Markdown unordered and ordered lists to HTML lists."""
+    in_ul = False  # Unordered list flag
+    in_ol = False  # Ordered list flag
     html_lines = []
+
     for line in lines:
         if line.startswith('- '):
-            if not in_list:
+            if not in_ul:
+                if in_ol:  # Close ordered list if open
+                    html_lines.append('</ol>')
+                    in_ol = False
                 html_lines.append('<ul>')
-                in_list = True
+                in_ul = True
+            html_lines.append(f"<li>{line[2:].strip()}</li>")
+        elif line.startswith('* '):
+            if not in_ol:
+                if in_ul:  # Close unordered list if open
+                    html_lines.append('</ul>')
+                    in_ul = False
+                html_lines.append('<ol>')
+                in_ol = True
             html_lines.append(f"<li>{line[2:].strip()}</li>")
         else:
-            if in_list:
-                html_lines.append('</ul>')
-                in_list = False
+            if in_ul or in_ol:
+                html_lines.append('</ul>' if in_ul else '</ol>')
+                in_ul = in_ol = False
             if line.strip():  # Avoid adding blank lines
                 html_lines.append(line.strip())
-    if in_list:  # Close the list if the file ends while still in a list
-        html_lines.append('</ul>')
+
+    # Close any open lists at the end of file
+    if in_ul or in_ol:
+        html_lines.append('</ul>' if in_ul else '</ol>')
+
     return html_lines
 
 def main():
